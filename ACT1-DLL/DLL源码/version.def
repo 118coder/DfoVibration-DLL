@@ -1,0 +1,27 @@
+; ============================================================
+; version 代理 DLL 导出定义 —— 无 @n 修饰名, 与工作区先例
+; SimSunFontHook\\version.def 同款写法(Real_ 别名 -> 导出名)。
+; DNF.exe 导入表对 version.dll 的引用是 GetFileVersionInfoA /
+; GetFileVersionInfoSizeA (无 @, 见 SimSunFontHook\\dnf_imports.txt
+; 第 390/391 行); 这里导出全部 17 个 System32\\version.dll 同名
+; 函数, 确保游戏版本查询功能完整。
+; ============================================================
+LIBRARY version
+EXPORTS
+    GetFileVersionInfoA           = Real_GetFileVersionInfoA
+    GetFileVersionInfoByHandle    = Real_GetFileVersionInfoByHandle
+    GetFileVersionInfoExA         = Real_GetFileVersionInfoExA
+    GetFileVersionInfoExW         = Real_GetFileVersionInfoExW
+    GetFileVersionInfoSizeA       = Real_GetFileVersionInfoSizeA
+    GetFileVersionInfoSizeExA     = Real_GetFileVersionInfoSizeExA
+    GetFileVersionInfoSizeExW     = Real_GetFileVersionInfoSizeExW
+    GetFileVersionInfoSizeW       = Real_GetFileVersionInfoSizeW
+    GetFileVersionInfoW           = Real_GetFileVersionInfoW
+    VerFindFileA                  = Real_VerFindFileA
+    VerFindFileW                  = Real_VerFindFileW
+    VerInstallFileA               = Real_VerInstallFileA
+    VerInstallFileW               = Real_VerInstallFileW
+    VerLanguageNameA              = Real_VerLanguageNameA
+    VerLanguageNameW              = Real_VerLanguageNameW
+    VerQueryValueA                = Real_VerQueryValueA
+    VerQueryValueW                = Real_VerQueryValueW
