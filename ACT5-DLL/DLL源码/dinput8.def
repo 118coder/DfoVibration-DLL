@@ -1,0 +1,14 @@
+; ============================================================
+; dinput8 代理 DLL 导出定义 —— 无 @n 修饰名
+; DNF.exe 导入表对 dinput8 的引用是 "DirectInput8Create" (hint 0),
+; 不带 stdcall 装饰; 这里强制导出干净名字以精确匹配。
+; 6 个导出与 System32\dinput8.dll 完全同名(见 llvm-readobj 对照)。
+; ============================================================
+LIBRARY dinput8
+EXPORTS
+    DirectInput8Create
+    DllCanUnloadNow
+    DllGetClassObject
+    DllRegisterServer
+    DllUnregisterServer
+    GetdfDIJoystick
