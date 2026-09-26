@@ -1,0 +1,52 @@
+#ifndef VIB_TARGET_OLD_H
+#define VIB_TARGET_OLD_H
+/* ============================================================
+ * 版本锚点深模块（唯一版本剖面）—— ACT1 / ACT5
+ * ============================================================
+ * 目的：把所有「随客户端版本变化」的地址 / 偏移 / 状态名指针 / hookLen
+ *       集中到本文件。引擎(hooks_old.c)、采集(dfovib_old.c)、协议
+ *       (vib_protocol_old.h) 只引用本模块符号，不再出现版本字面量。
+ *       换版本 = 改本文件（或加一段 #elif），其余代码零改动。
+ *
+ * 关键约定（防崩游戏，vib-mod 铁律）：
+ *   1. VIB_ANCHOR_UNRESOLVED(0) = 该版本尚未定位。
+ *      安装/轮询遇到 0 必须【显式跳过并记日志】，绝不静默安装错地址
+ *      （错地址 = E9 改写无关代码 = 游戏崩溃，与教训 1 同源）。
+ *   2. 每个 hook 锚点带 8 字节期望签名 + 有效长度；安装前 memcmp，
+ *      不匹配则拒绝安装（把「错地址=崩溃」降级为「错地址=拒绝启动」）。
+ *   3. 【已证实】标注者方可用于事件判定；【未定位】一律 UNRESOLVED。
+ *
+ * 剖面切换：编译期 -DVIB_TARGET=1(ACT1, 默认) / =5(ACT5) / =60(60US)
+ *   构建脚本：build_old.bat(ACT1) / build_act5.bat(ACT5) / build_60us.bat(60US)
+ *
+ * VIB_PROFILE_ACT5_FAMILY：ACT5/60US 共用的「宽串 + 同构分发」家族开关。
+ *   hooks_old.c / dfovib_old.c 里带 ACT5 行为分支的 #if 统一改判本宏，
+ *   60US（同为 UTF-16 宽串 + 播报层 a2 6/7 同码 + HK1_COUNT_* 串存在）
+ *   直接复用 ACT5 家族分支，无需复制代码。
+ * ============================================================ */
+
+#define VIB_TARGET_ACT1   1
+#define VIB_TARGET_ACT5   5
+#define VIB_TARGET_60US   60
+#ifndef VIB_TARGET
+#define VIB_TARGET        VIB_TARGET_ACT1   /* 默认保持 ACT1 现网行为不变 */
+#endif
+
+#define VIB_ANCHOR_UNRESOLVED  0UL
+#define VIB_ANCHOR_IS_SET(x)   ((x) != VIB_ANCHOR_UNRESOLVED)
+#define VIB_HOOK_COUNT         13           /* 数组容量必须与锚点表一致（教训 12） */
+
+/* ================================================================
+ * 剖面：ACT1（LMA1S-release, 2008-06-17, ImageBase 0x400000）
+ * 全部已定案（见 03/07 号文档 + 无损对接交接文档第五节）
+ * ================================================================ */
+#if VIB_TARGET == VIB_TARGET_ACT1
+
+#define VIB_PROFILE_ACT5_FAMILY 0                /* ACT1 = ASCII 串独立分支 */
+#define VIB_PROBE_COUNT   0                      /* 无定位探针(仅 60US 用) */
+
+#else
+#error "VIB_TARGET must be 1 (ACT1), 5 (ACT5) or 60 (60US)"
+#endif
+
+#endif /* VIB_TARGET_OLD_H */
