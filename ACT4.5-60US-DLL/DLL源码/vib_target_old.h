@@ -411,14 +411,30 @@
 #define TGT_STR_R_HK2_1GOOD          0x00CDC544UL
 
 /* ---- 全局对象 / 偏移 ---- */
-/* 玩家对象全局【未定位】：CNUser 基类 ctor=0x4c7910(派生 0x4c7b70), 但创建
- * 包装无直接代码 xref; HP 槽反查(p34)的 5 个候选全局证据不足。
- * ⚠负结果：+0x155C 槽(505 处引用)解密后与 22 比较 = 限时状态块状态ID,
+/* ★玩家对象全局【已定案 2026-09-28】= 0x0104F1D4（模拟器项目 client_hook 称 jj_0）：
+ *   ① client_hook/patch_table.zig:4473 `local_player = 0x104F1D4`(其生产补丁 DLL 的
+ *     本地角色判定); docs/archive/DEBUG_NOTES.md 活体：全库仅两处写 —— 角色加载尾巴
+ *     0x40ABF2 call sub_55B7D0 挂上(jj_0 = *(stage+516))、析构 sub_55ADF0 清零;
+ *     HUD/镜头/铺图都读它 → 城镇+副本通用。
+ *   ② 本库伤害归属比较：0x49D83B `cmp [0x104F1D4],[esi+0x458]`(sete→标志bit0)、
+ *     0x58E89A `mov edx,[0x104F1D4]`(0x07 标志组装) —— 与 [us] 事件宿主语义一致。
+ *   ③ 全库 1019 处引用(p54)。
+ * ⚠负结果（仍有效）：+0x155C 槽(505 处引用)解密后与 22 比较 = 限时状态块状态ID,
  *   绝不是 HP（ACT5 v13.17 同型雷, 勿踩第二次）。+0x1828 同属状态块。 */
-#define TGT_PLAYER_OBJ           VIB_ANCHOR_UNRESOLVED
+#define TGT_PLAYER_OBJ           0x0104F1D4UL
+/* 城镇玩家对象【已证伪 2026-09-28 实测, 撤回 UNRESOLVED】：
+ *   0x0104F1D8 是【每张地图的标记对象】, 不是城镇玩家 —— [mvB] 实测：坐标长时间
+ *   静止(29,429 / 866,288 / 474,234=门标记), 且对象指针本身随换图变化
+ *   (0x1CD83000→0x1CD8E000); 留着只会在换图时发幻影移动脉冲。
+ *   60US 城镇移动由源 A(0x104F1D4) 直接管（实测坐标全程活）, 无需第二源。
+ *   若日后要独立城镇源, 从 CNUser 派生对象创建链另找。 */
 #define TGT_TOWN_OBJ             VIB_ANCHOR_UNRESOLVED
-#define TGT_PLAYER_XOFF          VIB_ANCHOR_UNRESOLVED
-#define TGT_PLAYER_YOFF          VIB_ANCHOR_UNRESOLVED
+/* 坐标【已定案 2026-09-28】= +0x198(x) / +0x19C(y)：client_hook live-verified
+ * (patch_table.zig:6088 场外哨兵 -10000.0f=0xC61C4000 落在实体 +0x198/+0x19C 双
+ * dword; test_room_clear.py 实体模型 (0x198,x),(0x19C,y)); 本库读点 598/403 处
+ * (p57)。代际: ACT1 +0x13C → ACT5 +0x16C → 60US +0x198。 */
+#define TGT_PLAYER_XOFF          0x198UL
+#define TGT_PLAYER_YOFF          0x19CUL
 #define TGT_PLAYER_OWNER_OFF     VIB_ANCHOR_UNRESOLVED
 #define TGT_PLAYER_HP_SLOT_OFF   VIB_ANCHOR_UNRESOLVED
 #define TGT_PLAYER_MP_SLOT_OFF   VIB_ANCHOR_UNRESOLVED

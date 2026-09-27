@@ -409,11 +409,25 @@ void __cdecl vib_dispatch_damage_font(void *obj, DWORD a2, DWORD a4, DWORD a5, D
             vib_collect(VEV_FONT, FONT_FLAG_EFFECT, tick, 1);
             return;
         }
+        /* ★v6 回复/治疗通道(2026-09-28, 对齐 ACT1 v13.20 口径):
+         *   静态定案(p55): 生成器调用点 0x49D853 存在【常量 push 4】= 纯 0x04 数字
+         *   (无 bit0/1/5); 0x58E8BC `or ecx,4` 只给受击族附加 bit2(=0x07, 已被上面
+         *   bit1 分流)。故 0x04 / 0x05(0x04|0x01) = 回复字 → 宿主「玩家状态变化
+         *   反馈 0x08」独立滑块(与 ACT1/ACT5 [heal] 同通道)。喝药/治疗实测待验。 */
+        if (a5 & FONT_FLAG_EFFECT) {              /* bit2 = 回复/治疗 */
+            dll_log2("[us] heal flags=%02X dmg=%u", a5, a4);
+            vib_collect(VEV_FONT, FONT_FLAG_STATE, tick, 1);
+            return;
+        }
         if (a5 & FONT_FLAG_PLAYER_ATTACK) {       /* bit0 = 普攻命中 */
             vib_collect(VEV_FONT, FONT_FLAG_PLAYER_ATTACK, tick, 1);
             return;
         }
-        return;                                   /* 其余位(0x04 等)语义未定 → 不发 */
+        {   /* 其余位组合: 2s 节流日志(给下一轮定案未知标志), 不发震动 */
+            static DWORD s_unk;
+            if (tick - s_unk >= 2000) { s_unk = tick; dll_log2("[us] unk flags=%02X dmg=%u", a5, a4); }
+        }
+        return;
     }
     player = VIB_ANCHOR_IS_SET(OLD_PLAYER_OBJ) ? *(DWORD *)OLD_PLAYER_OBJ : 0;
     /* ★命中分组探针(仅纯 0x01 命中流; 与命中合并窗 slot48 同一批事件) */
